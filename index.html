@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Pokédex avançada com favoritos, comparação, temas e busca avançada"
+    />
+    <title>Pokédex</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23fff'/%3E%3Cpath d='M4 50a46 46 0 0 1 92 0z' fill='%23e3350d'/%3E%3Crect x='4' y='47' width='92' height='6' fill='%23222'/%3E%3Ccircle cx='50' cy='50' r='16' fill='%23fff' stroke='%23222' stroke-width='6'/%3E%3Ccircle cx='50' cy='50' r='7' fill='%2358a5f0'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Fundo dinâmico: gerado a cada carregamento, simulando a Pokédex apontada para o chão -->
+    <div
+      id="groundBackground"
+      class="ground-background"
+      aria-hidden="true"
+    ></div>
+    <div class="ground-vignette" aria-hidden="true"></div>
+
+    <main>
+      <!-- Pokédex Fechada -->
+      <section
+        id="closedPokedex"
+        class="closed-pokedex"
+        role="button"
+        tabindex="0"
+        aria-label="Abrir Pokédex"
+        title="Clique para abrir"
+      >
+        <div class="closed-pokedex-inner">
+          <div class="closed-pokedex-front">
+            <!-- dobradiças do modelo flip -->
+            <div class="hinge hinge-top"></div>
+            <div class="hinge hinge-bottom"></div>
+            <div class="closed-seam"></div>
+
+            <!-- parafusos decorativos -->
+            <span class="rivet rivet-tl"></span>
+            <span class="rivet rivet-tr"></span>
+            <span class="rivet rivet-bl"></span>
+            <span class="rivet rivet-br"></span>
+
+            <div class="closed-pokedex-top-row">
+              <div class="closed-pokedex-light">
+                <span class="lens-shine"></span>
+              </div>
+              <div class="closed-indicator-lights">
+                <span class="indicator-light red"></span>
+                <span class="indicator-light yellow"></span>
+                <span class="indicator-light green"></span>
+              </div>
+            </div>
+
+            <div class="closed-pokedex-lines"></div>
+
+            <div class="closed-speaker" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+
+            <div class="closed-label-plate">
+              <span>Pokédex</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Container da Pokédex Aberta -->
+      <section
+        id="pokedexContainer"
+        class="pokedex-container"
+        role="dialog"
+        aria-labelledby="pokedexTitle"
+        aria-modal="true"
+        aria-hidden="true"
+      >
+        <article class="pokedex theme-gen1" id="pokedexTheme">
+          <header class="pokedex-top">
+            <div class="pokedex-header">
+              <div class="pokedex-title">
+                <h1 id="pokedexTitle"><span class="power-led" aria-hidden="true"></span>Pokédex</h1>
+                <p
+                  id="totalPokemonCount"
+                  class="total-count"
+                  aria-live="polite"
+                ></p>
+              </div>
+              <div class="header-buttons">
+               
+                <button
+                  id="closePokedexBtn"
+                  class="close-btn"
+                  aria-label="Fechar Pokédex"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="screen"
+              role="region"
+              aria-label="Informações do Pokémon"
+            >
+              <div id="pokemonDisplay" class="pokemon-display">
+                <div id="screenLoader" class="screen-loader" aria-hidden="true">
+                  <span class="pokeball-spinner"></span>
+                </div>
+                <figure class="pokemon-image-container">
+                  <img
+                    id="pokemonImage"
+                    src=""
+                    alt="Pokémon selecionado"
+                    loading="lazy"
+                  />
+                  <figcaption
+                    id="pokemonImageCaption"
+                    class="sr-only"
+                  ></figcaption>
+                </figure>
+
+                <div id="pokemonInfo" class="pokemon-info">
+                  <div class="pokemon-name-row">
+                    <h2 id="pokemonName">Nome do Pokémon</h2>
+                    <button
+                      id="favoriteBtn"
+                      class="favorite-btn"
+                      aria-label="Adicionar aos favoritos"
+                    >
+                      ☆
+                    </button>
+                  </div>
+                  <p id="pokemonNumber" class="pokemon-number-display">Nº:</p>
+                  <p id="pokemonTypes">Tipos:</p>
+                  <p id="pokemonHeight">Altura:</p>
+                  <p id="pokemonWeight">Peso:</p>
+                  <p id="pokemonAbilities">Habilidades:</p>
+                  <p id="pokemonRegion">Região:</p>
+                  <div id="pokemonStats" class="stats-container"></div>
+                </div>
+              </div>
+            </div>
+
+            <nav
+              class="navigation-controls"
+              aria-label="Navegação entre Pokémon"
+            >
+              <button
+                id="prevPokemonBtn"
+                class="nav-btn"
+                aria-label="Pokémon anterior"
+              >
+                ← Anterior
+              </button>
+              <span id="pokemonCounter" class="counter" aria-live="polite"
+                >1/898</span
+              >
+              <button
+                id="nextPokemonBtn"
+                class="nav-btn"
+                aria-label="Próximo Pokémon"
+              >
+                Próximo →
+              </button>
+            </nav>
+          </header>
+
+          <footer class="pokedex-bottom">
+            <section class="search-container" aria-label="Buscar Pokémon">
+              <input
+                type="search"
+                id="searchInput"
+                placeholder="Buscar Pokémon..."
+                autocomplete="off"
+              />
+              <select
+                id="searchType"
+                class="search-type"
+                aria-label="Tipo de busca"
+              >
+                <option value="name">Nome</option>
+                <option value="type">Tipo</option>
+                <option value="ability">Habilidade</option>
+                <option value="region">Região</option>
+              </select>
+              <button id="searchBtn" aria-label="Buscar">Buscar</button>
+            </section>
+
+            <section class="action-buttons" aria-label="Ações">
+              <button id="speakBtn" class="action-btn">🔊 Fala: ON</button>
+              <button id="randomBtn" class="action-btn">🎲 Aleatório</button>
+              <button id="listBtn" class="action-btn">📋 Lista</button>
+              <button id="favoritesBtn" class="action-btn">⭐ Favoritos</button>
+              <button id="compareBtn" class="action-btn">⚖️ Comparar</button>
+            </section>
+
+            <!-- Seletor de Temas -->
+            <section class="theme-settings" aria-label="Seletor de temas">
+              <h3>🎨 Temas por Geração</h3>
+              <div class="theme-buttons">
+                <button
+                  class="theme-btn active"
+                  data-theme="gen1"
+                  title="Geração 1 - Kanto"
+                >
+                  <span class="theme-color gen1"></span>
+                  <span>Kanto</span>
+                </button>
+                <button
+                  class="theme-btn"
+                  data-theme="gen2"
+                  title="Geração 2 - Johto"
+                >
+                  <span class="theme-color gen2"></span>
+                  <span>Johto</span>
+                </button>
+                <button
+                  class="theme-btn"
+                  data-theme="gen3"
+                  title="Geração 3 - Hoenn"
+                >
+                  <span class="theme-color gen3"></span>
+                  <span>Hoenn</span>
+                </button>
+                <button
+                  class="theme-btn"
+                  data-theme="gen4"
+                  title="Geração 4 - Sinnoh"
+                >
+                  <span class="theme-color gen4"></span>
+                  <span>Sinnoh</span>
+                </button>
+                <button
+                  class="theme-btn"
+                  data-theme="gen5"
+                  title="Geração 5 - Unova"
+                >
+                  <span class="theme-color gen5"></span>
+                  <span>Unova</span>
+                </button>
+                <button
+                  class="theme-btn"
+                  data-theme="gen6"
+                  title="Geração 6 - Kalos"
+                >
+                  <span class="theme-color gen6"></span>
+                  <span>Kalos</span>
+                </button>
+                <button
+                  class="theme-btn"
+                  data-theme="gen7"
+                  title="Geração 7 - Alola"
+                >
+                  <span class="theme-color gen7"></span>
+                  <span>Alola</span>
+                </button>
+                <button
+                  class="theme-btn"
+                  data-theme="gen8"
+                  title="Geração 8 - Galar"
+                >
+                  <span class="theme-color gen8"></span>
+                  <span>Galar</span>
+                </button>
+                <button
+                  class="theme-btn"
+                  data-theme="gen9"
+                  title="Geração 9 - Paldea"
+                >
+                  <span class="theme-color gen9"></span>
+                  <span>Paldea</span>
+                </button>
+              </div>
+            </section>
+
+            <!-- Lista de Pokémon -->
+            <section
+              id="pokemonListContainer"
+              class="pokemon-list-container"
+              style="display: none"
+              aria-label="Lista de Pokémon"
+            >
+              <header class="list-header">
+                <h2>Todos os Pokémon</h2>
+                <button
+                  id="closeListBtn"
+                  class="close-list-btn"
+                  aria-label="Fechar lista"
+                >
+                  ×
+                </button>
+              </header>
+              <input
+                type="search"
+                id="listSearchInput"
+                placeholder="Filtrar lista..."
+                class="list-search"
+                autocomplete="off"
+              />
+              <div id="pokemonList" class="pokemon-list" role="list"></div>
+            </section>
+
+            <!-- Lista de Favoritos -->
+            <section
+              id="favoritesContainer"
+              class="favorites-container"
+              style="display: none"
+              aria-label="Pokémon favoritos"
+            >
+              <header class="list-header">
+                <h2>⭐ Pokémon Favoritos</h2>
+                <button
+                  id="closeFavoritesBtn"
+                  class="close-list-btn"
+                  aria-label="Fechar favoritos"
+                >
+                  ×
+                </button>
+              </header>
+              <div id="favoritesList" class="favorites-list" role="list"></div>
+            </section>
+
+            <!-- Comparação de Pokémon -->
+            <section
+              id="compareContainer"
+              class="compare-container"
+              style="display: none"
+              aria-label="Comparação de Pokémon"
+            >
+              <header class="list-header">
+                <h2>⚖️ Comparar Pokémon</h2>
+                <button
+                  id="closeCompareBtn"
+                  class="close-list-btn"
+                  aria-label="Fechar comparação"
+                >
+                  ×
+                </button>
+              </header>
+              <div class="compare-selection">
+                <div class="compare-slot">
+                  <label for="comparePokemon1">Pokémon 1:</label>
+                  <input
+                    type="text"
+                    id="comparePokemon1"
+                    placeholder="ID ou nome"
+                    class="compare-input"
+                  />
+                </div>
+                <div class="compare-slot">
+                  <label for="comparePokemon2">Pokémon 2:</label>
+                  <input
+                    type="text"
+                    id="comparePokemon2"
+                    placeholder="ID ou nome"
+                    class="compare-input"
+                  />
+                </div>
+                <button id="compareNowBtn" class="compare-btn">Comparar</button>
+              </div>
+              <div id="compareResults" class="compare-results"></div>
+            </section>
+          </footer>
+        </article>
+      </section>
+    </main>
+
+    <footer class="main-footer">
+      <p>
+        Dados fornecidos pela
+        <a href="https://pokeapi.co" target="_blank" rel="noopener">PokéAPI</a>
+      </p>
+    </footer>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
