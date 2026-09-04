@@ -1,4 +1,4 @@
-# Pokédex
+# [Pokédex](https://netopagnani.github.io/pokedex/)
 
 Uma Pokédex web interativa e avançada, com animação de abertura/fechamento, temas por geração, busca avançada, comparação de Pokémon, favoritos e narração por voz. Construída com HTML, CSS e JavaScript puros, consumindo dados da [PokéAPI](https://pokeapi.co).
 
